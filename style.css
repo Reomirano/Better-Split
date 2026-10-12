@@ -380,3 +380,27 @@ input:focus {
         border: 1px solid var(--border-color);
     }
 }
+
+/* Diskretno dugme za preuzimanje QR koda */
+.qr-download-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background-color: var(--bg-app);
+    color: var(--light-green);
+    border: 1px solid var(--border-color);
+    padding: 6px 14px;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    text-decoration: none;
+    margin-top: 12px;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+}
+
+.qr-download-btn:hover {
+    background-color: var(--border-color);
+    color: white;
+    transform: translateY(-1px);
+}
