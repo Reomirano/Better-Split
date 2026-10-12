@@ -35,6 +35,24 @@ function ukloniKvacice(str) {
         .replace(/ž/g, 'z').replace(/Ž/g, 'Z');
 }
 
+// Pomoćna funkcija za preuzimanje slike preko bloba (da radi pouzdano na mobilnim uređajima)
+async function preuzmiQR(url, nazivFajla) {
+    try {
+        const response = await fetch(url);
+        const blob = await response.blob();
+        const blobUrl = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = blobUrl;
+        a.download = nazivFajla;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(blobUrl);
+    } catch (err) {
+        window.open(url, '_blank');
+    }
+}
+
 // --- STANJE APLIKACIJE ---
 let stanje = {
     userName: "",
@@ -208,7 +226,7 @@ function osveziProracune() {
             
             const ostatak = sumaUkupno - trenutnaSuma;
             if (Math.abs(ostatak) < 0.01 && sumaUkupno > 0) {
-                statusRazlikeContainer.innerHTML = `<div class="info-box">Iznosi su potpuno izbalansirani!</div>`;
+                statusRazlikeContainer.innerHTML = `<div class="info-box">Izbori su potpuno izbalansirani!</div>`;
                 validnaPodelaFlag = true;
             } else if (ostatak > 0) {
                 statusRazlikeContainer.innerHTML = `<div class="warning-box">Preostalo: <strong>${formatirajBrojSaTackom(ostatak)} RSD</strong></div>`;
@@ -292,6 +310,7 @@ function generisiQRKodove() {
         const poOsobi = Math.round(sumaUkupno / stanje.brojLjudi);
         const izFmt = (poOsobi).toFixed(2).replace('.', ',');
         const ipsData = `K:PR|V:01|C:1|R:${cRacun}|N:${imePrimaoca}|I:RSD${izFmt}|SF:289|S:Podela racuna`;
+        const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(ipsData)}`;
         
         const card = document.createElement("div");
         card.className = "qr-card";
@@ -306,12 +325,22 @@ function generisiQRKodove() {
         qrBox.className = "qr-image-box";
         
         const img = document.createElement("img");
-        img.src = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(ipsData)}`;
+        img.src = qrUrl;
         img.alt = "IPS QR Kod";
         
         qrBox.appendChild(img);
         qrWrapper.appendChild(qrBox);
         card.appendChild(qrWrapper);
+
+        // Diskretno dugme za preuzimanje sa disketom 💾
+        const downloadBtn = document.createElement("button");
+        downloadBtn.className = "qr-download-btn";
+        downloadBtn.innerHTML = "💾 Sačuvaj QR";
+        downloadBtn.addEventListener("click", () => {
+            preuzmiQR(qrUrl, `ips-qr-zajednicki-${poOsobi}rsd.png`);
+        });
+        card.appendChild(downloadBtn);
+
         qrRezultatiContainer.appendChild(card);
         
     } else {
@@ -320,6 +349,7 @@ function generisiQRKodove() {
                 const izFmt = (dug).toFixed(2).replace('.', ',');
                 const cistIme = ukloniKvacice(ime);
                 const ipsData = `K:PR|V:01|C:1|R:${cRacun}|N:${imePrimaoca}|I:RSD${izFmt}|SF:289|S:Rucak-${cistIme}`;
+                const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(ipsData)}`;
                 
                 const card = document.createElement("div");
                 card.className = "qr-card";
@@ -334,12 +364,22 @@ function generisiQRKodove() {
                 qrBox.className = "qr-image-box";
                 
                 const img = document.createElement("img");
-                img.src = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(ipsData)}`;
+                img.src = qrUrl;
                 img.alt = "IPS QR Kod";
                 
                 qrBox.appendChild(img);
                 qrWrapper.appendChild(qrBox);
                 card.appendChild(qrWrapper);
+
+                // Diskretno dugme za preuzimanje sa disketom 💾
+                const downloadBtn = document.createElement("button");
+                downloadBtn.className = "qr-download-btn";
+                downloadBtn.innerHTML = "💾 Sačuvaj QR";
+                downloadBtn.addEventListener("click", () => {
+                    preuzmiQR(qrUrl, `ips-qr-${cistIme.toLowerCase()}-${dug}rsd.png`);
+                });
+                card.appendChild(downloadBtn);
+
                 qrRezultatiContainer.appendChild(card);
             }
         }
