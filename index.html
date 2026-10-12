@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="sr">
+<head>
+    <meta charset="UTF-8">
+    <title>Podela troškova</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<h1>💰 Podela troškova</h1>
+
+<div class="box">
+    <h2>💳 Podaci o primaocu</h2>
+
+    <label>Primalac:</label>
+    <input id="ime" type="text" placeholder="Ime i prezime">
+
+    <label>Broj računa primaoca:</label>
+    <input id="racun" type="text" placeholder="npr. 160-12345678999-12">
+
+    <div id="validanRacun" class="info"></div>
+</div>
+
+<div class="box">
+    <h2>🧾 Podaci o trošku</h2>
+
+    <label>Iznos sa računa (RSD):</label>
+    <input id="iznos" type="number" min="0" value="0">
+
+    <label>Dostava (RSD):</label>
+    <input id="dostava" type="number" min="0" value="0">
+
+    <div id="ukupno" class="metric"></div>
+</div>
+
+<div class="box">
+    <h2>Metoda podele</h2>
+
+    <button class="pill" onclick="setMode('equal')">Ravnopravno</button>
+    <button class="pill" onclick="setMode('manual')">Ručni unos</button>
+
+    <div id="modeBox"></div>
+</div>
+
+<div class="box">
+    <button id="qrBtn" onclick="generateQR()">⚡ GENERIŠI QR KODOVE</button>
+    <div id="qrOutput"></div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script src="app.js"></script>
+
+</body>
+</html>
