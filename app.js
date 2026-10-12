@@ -32,10 +32,10 @@ let stanje = {
     userBank: "",
     vRacun: 0,
     vDostava: 0,
-    metoda: "Ravnopravno", // "Ravnopravno" ili "Rucni"
+    metoda: "Ravnopravno",
     brojLjudi: 2,
-    clanoviUcesnici: [], // niz imena
-    rucniIznosi: {} // map { ime: iznos }
+    clanoviUcesnici: [],
+    rucniIznosi: {}
 };
 
 // --- DOM ELEMENTI ---
@@ -105,7 +105,6 @@ btnNoviIznos.addEventListener("click", () => {
     osveziProracune();
 });
 
-// Pills dugmad
 pillBtns.forEach(btn => {
     btn.addEventListener("click", (e) => {
         pillBtns.forEach(b => b.classList.remove("active"));
@@ -186,7 +185,6 @@ function osveziProracune() {
             validnaPodelaFlag = false;
         }
     } else {
-        // Ručni unos
         if (stanje.clanoviUcesnici.length > 0) {
             const brUcesnika = stanje.clanoviUcesnici.length;
             const fiksnaDostava = stanje.vDostava / brUcesnika;
@@ -218,7 +216,6 @@ function osveziProracune() {
         }
     }
     
-    // Prikaz dugmeta za QR kodove
     if (validnaPodelaFlag && sumaUkupno > 0 && stanje.userName.trim() && stanje.userBank.trim()) {
         btnGenerisiQR.style.display = "block";
     } else {
@@ -272,6 +269,12 @@ function proveriGlavniQRUslov() {
 
 function generisiQRKodove() {
     qrRezultatiContainer.innerHTML = "";
+    
+    if (typeof QRCode === 'undefined') {
+        alert("⚠️ QR biblioteka nije učitana!");
+        return;
+    }
+
     const sumaUkupno = stanje.vRacun + stanje.vDostava;
     const cRacun = ocistiRacun(stanje.userBank);
     const imePrimaoca = stanje.userName.trim();
@@ -312,7 +315,6 @@ function generisiQRKodove() {
         });
         
     } else {
-        // Ručni unos
         for (const [ime, dug] of Object.entries(stanje.rucniIznosi)) {
             if (dug > 0) {
                 const izFmt = (dug).toFixed(2).replace('.', ',');
