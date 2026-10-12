@@ -105,8 +105,8 @@ btnNoviIznos.addEventListener("click", () => {
     stanje.clanoviUcesnici = [];
     stanje.rucniIznosi = {};
     
-    inputVRacun.value = 0;
-    inputVDostava.value = 0;
+    inputVRacun.value = "";
+    inputVDostava.value = "";
     brojLjudiInput.value = 2;
     novoImeInput.value = "";
     qrRezultatiContainer.innerHTML = "";
@@ -247,8 +247,9 @@ function renderujRucneUcesnike() {
         inputNum.type = "number";
         inputNum.className = "participant-input";
         inputNum.min = "0";
+        inputNum.placeholder = "0";
         inputNum.step = "1";
-        inputNum.value = stanje.rucniIznosi[o] || 0;
+        inputNum.value = stanje.rucniIznosi[o] || "";
         inputNum.addEventListener("input", (e) => {
             stanje.rucniIznosi[o] = parseFloat(e.target.value) || 0;
             osveziProracune();
