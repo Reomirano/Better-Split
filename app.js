@@ -1,115 +1,347 @@
-function ocistiRacun(r) {
-    let cifre = r.replace(/\D/g, "");
-    if (cifre.length > 5 && cifre.length < 18) {
-        let kod = cifre.slice(0, 3);
-        let kontrolni = cifre.slice(-2);
-        let partija = cifre.slice(3, -2).padStart(13, "0");
-        return kod + partija + kontrolni;
+// --- FUNKCIJE ---
+function ocistiRacun(racunStr) {
+    const samoCifre = String(racunStr).replace(/\D/g, '');
+    
+    if (samoCifre.length > 5 && samoCifre.length < 18) {
+        const kodBanke = samoCifre.slice(0, 3);
+        const kontrolniBroj = samoCifre.slice(-2);
+        const partijaRacuna = samoCifre.slice(3, -2);
+        
+        const partijaSaNulam = partijaRacuna.padStart(13, '0');
+        
+        return `${kodBanke}${partijaSaNulam}${kontrolniBroj}`;
     }
-    return cifre.padStart(18, "0");
+    
+    return samoCifre.padStart(18, '0');
 }
 
-function formatirajRacun(r) {
-    return r.length === 18 ? `${r.slice(0,3)}-${r.slice(3,-2)}-${r.slice(-2)}` : r;
+function formatirajZaPrikaz(racun18Cifara) {
+    if (racun18Cifara.length === 18) {
+        return `${racun18Cifara.slice(0, 3)}-${racun18Cifara.slice(3, -2)}-${racun18Cifara.slice(-2)}`;
+    }
+    return racun18Cifara;
 }
 
-function updateRacun() {
-    let r = document.getElementById("racun").value;
-    let c = ocistiRacun(r);
-    document.getElementById("validanRacun").innerHTML =
-        `Validan račun: <b>${formatirajRacun(c)}</b>`;
+function formatirajBrojSaTackom(broj) {
+    return Math.round(broj).toLocaleString('de-DE');
 }
 
-document.getElementById("racun").addEventListener("input", updateRacun);
+// --- STANJE APLIKACIJE ---
+let stanje = {
+    userName: "",
+    userBank: "",
+    vRacun: 0,
+    vDostava: 0,
+    metoda: "Ravnopravno", // "Ravnopravno" ili "Rucni"
+    brojLjudi: 2,
+    clanoviUcesnici: [], // niz imena
+    rucniIznosi: {} // map { ime: iznos }
+};
 
-let mode = "equal";
-let clanovi = [];
+// --- DOM ELEMENTI ---
+const inputUserName = document.getElementById("userName");
+const inputUserBank = document.getElementById("userBank");
+const validAccountBanner = document.getElementById("validAccountBanner");
+const validAccountDisplay = document.getElementById("validAccountDisplay");
 
-function setMode(m) {
-    mode = m;
-    let box = document.getElementById("modeBox");
+const inputVRacun = document.getElementById("vRacun");
+const inputVDostava = document.getElementById("vDostava");
+const btnNoviIznos = document.getElementById("btnNoviIznos");
+const sumaUkupnoDisplay = document.getElementById("sumaUkupnoDisplay");
 
-    if (m === "equal") {
-        box.innerHTML = `
-            <label>Broj osoba:</label>
-            <input id="brOsoba" type="number" min="1" value="2">
-        `;
+const pillBtns = document.querySelectorAll(".pill-btn");
+const panelRavnopravno = document.getElementById("panelRavnopravno");
+const panelRucni = document.getElementById("panelRucni");
+
+const brojLjudiInput = document.getElementById("brojLjudi");
+const infoRavnopravno = document.getElementById("infoRavnopravno");
+const poOsobiDisplay = document.getElementById("poOsobiDisplay");
+
+const novoImeInput = document.getElementById("novoImeInput");
+const dostavaInfoBox = document.getElementById("dostavaInfoBox");
+const dostavaPoOsobiDisplay = document.getElementById("dostavaPoOsobiDisplay");
+const listaUcesnikaContainer = document.getElementById("listaUcesnikaContainer");
+const statusRazlikeContainer = document.getElementById("statusRazlikeContainer");
+const btnObrisiListu = document.getElementById("btnObrisiListu");
+
+const btnGenerisiQR = document.getElementById("btnGenerisiQR");
+const qrRezultatiContainer = document.getElementById("qrRezultatiContainer");
+
+// --- EVENT LISTENERS ---
+inputUserName.addEventListener("input", (e) => {
+    stanje.userName = e.target.value;
+    proveriGlavniQRUslov();
+});
+
+inputUserBank.addEventListener("input", (e) => {
+    stanje.userBank = e.target.value;
+    azurirajValidacijuRacuna();
+    proveriGlavniQRUslov();
+});
+
+inputVRacun.addEventListener("input", (e) => {
+    stanje.vRacun = parseFloat(e.target.value) || 0;
+    osveziProracune();
+});
+
+inputVDostava.addEventListener("input", (e) => {
+    stanje.vDostava = parseFloat(e.target.value) || 0;
+    osveziProracune();
+});
+
+btnNoviIznos.addEventListener("click", () => {
+    stanje.vRacun = 0;
+    stanje.vDostava = 0;
+    stanje.brojLjudi = 2;
+    stanje.clanoviUcesnici = [];
+    stanje.rucniIznosi = {};
+    
+    inputVRacun.value = 0;
+    inputVDostava.value = 0;
+    brojLjudiInput.value = 2;
+    novoImeInput.value = "";
+    qrRezultatiContainer.innerHTML = "";
+    
+    osveziProracune();
+});
+
+// Pills dugmad
+pillBtns.forEach(btn => {
+    btn.addEventListener("click", (e) => {
+        pillBtns.forEach(b => b.classList.remove("active"));
+        e.target.classList.add("active");
+        stanje.metoda = e.target.getAttribute("data-method");
+        
+        if (stanje.metoda === "Ravnopravno") {
+            panelRavnopravno.style.display = "block";
+            panelRucni.style.display = "none";
+        } else {
+            panelRavnopravno.style.display = "none";
+            panelRucni.style.display = "block";
+        }
+        osveziProracune();
+    });
+});
+
+brojLjudiInput.addEventListener("input", (e) => {
+    stanje.brojLjudi = parseInt(e.target.value) || 1;
+    osveziProracune();
+});
+
+novoImeInput.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") {
+        e.preventDefault();
+        const ime = novoImeInput.value.trim();
+        if (ime && !stanje.clanoviUcesnici.includes(ime)) {
+            stanje.clanoviUcesnici.push(ime);
+            stanje.rucniIznosi[ime] = 0;
+            novoImeInput.value = "";
+            renderujRucneUcesnike();
+            osveziProracune();
+        }
+    }
+});
+
+btnObrisiListu.addEventListener("click", () => {
+    stanje.clanoviUcesnici = [];
+    stanje.rucniIznosi = {};
+    renderujRucneUcesnike();
+    osveziProracune();
+});
+
+btnGenerisiQR.addEventListener("click", () => {
+    generisiQRKodove();
+});
+
+// --- LOGIKA I PRIKAZ ---
+function azurirajValidacijuRacuna() {
+    const raw = stanje.userBank.trim();
+    if (!raw) {
+        validAccountBanner.style.display = "none";
+        return;
+    }
+    const samoCifre = raw.replace(/\D/g, '');
+    const cRacun = ocistiRacun(samoCifre);
+    const prikaz = formatirajZaPrikaz(cRacun);
+    
+    validAccountDisplay.textContent = prikaz;
+    validAccountBanner.style.display = "block";
+}
+
+function osveziProracune() {
+    const sumaUkupno = stanje.vRacun + stanje.vDostava;
+    sumaUkupnoDisplay.textContent = formatirajBrojSaTackom(sumaUkupno) + " RSD";
+    
+    let validnaPodela = false;
+    
+    if (stanje.metoda === "Ravnopravno") {
+        if (stanje.brojLjudi > 1 && sumaUkupno > 0) {
+            const poOsobi = sumaUkupno / stanje.brojLjudi;
+            const poOsobiZaokruzeno = Math.round(poOsobi);
+            poOsobiDisplay.textContent = formatirajBrojSaTackom(poOsobiZaokruzeno) + " RSD";
+            infoRavnopravno.style.display = "block";
+            validna_podela_flag = true;
+        } else {
+            infoRavnopravno.style.display = "none";
+            validna_podela_flag = false;
+        }
     } else {
-        box.innerHTML = `
-            <label>Dodaj učesnika:</label>
-            <input id="noviClan" type="text" placeholder="Ime" onkeydown="if(event.key==='Enter') addClan()">
-            <div id="clanoviBox"></div>
-        `;
-        renderClanovi();
+        // Ručni unos
+        if (stanje.clanoviUcesnici.length > 0) {
+            const brUcesnika = stanje.clanoviUcesnici.length;
+            const fiksnaDostava = stanje.vDostava / brUcesnika;
+            dostavaPoOsobiDisplay.textContent = formatirajBrojSaTackom(Math.round(fiksnaDostava)) + " RSD";
+            dostavaInfoBox.style.display = "block";
+            btnObrisiListu.style.display = "block";
+            
+            let trenutnaSuma = 0;
+            stanje.clanoviUcesnici.forEach(o => {
+                trenutnaSuma += (stanje.rucniIznosi[o] || 0);
+            });
+            
+            const ostatak = sumaUkupno - trenutnaSuma;
+            if (Math.abs(ostatak) < 0.01 && sumaUkupno > 0) {
+                statusRazlikeContainer.innerHTML = `<div class="info-box">Izbori su potpuno izbalansirani!</div>`;
+                validna_podela_flag = true;
+            } else if (ostatak > 0) {
+                statusRazlikeContainer.innerHTML = `<div class="warning-box">Preostalo: <strong>${formatirajBrojSaTackom(ostatak)} RSD</strong></div>`;
+                validna_podela_flag = false;
+            } else {
+                statusRazlikeContainer.innerHTML = `<div class="error-box">Višak: <strong>${formatirajBrojSaTackom(Math.abs(ostatak))} RSD</strong></div>`;
+                validna_podela_flag = false;
+            }
+        } else {
+            dostavaInfoBox.style.display = "none";
+            btnObrisiListu.style.display = "none";
+            statusRazlikeContainer.innerHTML = "";
+            validna_podela_flag = false;
+        }
+    }
+    
+    // Prikaz dugmeta za QR kodove
+    if (validna_podela_flag && sumaUkupno > 0 && stanje.userName.trim() && stanje.userBank.trim()) {
+        btnGenerisiQR.style.display = "block";
+    } else {
+        btnGenerisiQR.style.display = "none";
+        qrRezultatiContainer.innerHTML = "";
     }
 }
 
-function addClan() {
-    let ime = document.getElementById("noviClan").value.trim();
-    if (ime && !clanovi.includes(ime)) clanovi.push(ime);
-    document.getElementById("noviClan").value = "";
-    renderClanovi();
-}
-
-function renderClanovi() {
-    let box = document.getElementById("clanoviBox");
-    box.innerHTML = "";
-
-    clanovi.forEach(ime => {
-        box.innerHTML += `
-            <div style="margin-bottom:10px;">
-                <b>${ime}</b>
-                <input id="dug_${ime}" type="number" min="0" value="0">
-                <button onclick="removeClan('${ime}')">❌</button>
-            </div>
-        `;
+function renderujRucneUcesnike() {
+    listaUcesnikaContainer.innerHTML = "";
+    stanje.clanoviUcesnici.forEach(o => {
+        const row = document.createElement("div");
+        row.className = "participant-row";
+        
+        const nameDiv = document.createElement("div");
+        nameDiv.className = "participant-name";
+        nameDiv.textContent = o + ":";
+        
+        const inputNum = document.createElement("input");
+        inputNum.type = "number";
+        inputNum.className = "participant-input";
+        inputNum.min = "0";
+        inputNum.step = "1";
+        inputNum.value = stanje.rucniIznosi[o] || 0;
+        inputNum.addEventListener("input", (e) => {
+            stanje.rucniIznosi[o] = parseFloat(e.target.value) || 0;
+            osveziProracune();
+        });
+        
+        const deleteBtn = document.createElement("button");
+        deleteBtn.className = "participant-delete";
+        deleteBtn.textContent = "❌";
+        deleteBtn.title = "Ukloni " + o;
+        deleteBtn.addEventListener("click", () => {
+            stanje.clanoviUcesnici = stanje.clanoviUcesnici.filter(item => item !== o);
+            delete stanje.rucniIznosi[o];
+            renderujRucneUcesnike();
+            osveziProracune();
+        });
+        
+        row.appendChild(nameDiv);
+        row.appendChild(inputNum);
+        row.appendChild(deleteBtn);
+        listaUcesnikaContainer.appendChild(row);
     });
 }
 
-function removeClan(ime) {
-    clanovi = clanovi.filter(c => c !== ime);
-    renderClanovi();
+function proveriGlavniQRUslov() {
+    osveziProracune();
 }
 
-function generateQR() {
-    let ime = document.getElementById("ime").value.trim();
-    let racun = ocistiRacun(document.getElementById("racun").value);
-    let iznos = Number(document.getElementById("iznos").value);
-    let dostava = Number(document.getElementById("dostava").value);
-
-    if (!ime || racun.length !== 18) {
-        alert("Popuni ime i validan račun!");
+function generisiQRKodove() {
+    qrRezultatiContainer.innerHTML = "";
+    const sumaUkupno = stanje.vRacun + stanje.vDostava;
+    const cRacun = ocistiRacun(stanje.userBank);
+    const imePrimaoca = stanje.userName.trim();
+    
+    if (!imePrimaoca || !cRacun) {
+        alert("⚠️ Popuni podatke o primaocu na vrhu strane!");
         return;
     }
-
-    let ukupno = iznos + dostava;
-    document.getElementById("ukupno").innerHTML = `Ukupno: ${ukupno} RSD`;
-
-    let out = document.getElementById("qrOutput");
-    out.innerHTML = "";
-
-    if (mode === "equal") {
-        let br = Number(document.getElementById("brOsoba").value);
-        let poOsobi = Math.round(ukupno / br);
-
-        let ips = `K:PR|V:01|C:1|R:${racun}|N:${ime}|I:RSD${poOsobi.toFixed(2).replace('.', ',')}|SF:289|S:Podela`;
-
-        out.innerHTML += `<h3>Zajednički: ${poOsobi} RSD</h3>`;
-        let div = document.createElement("div");
-        out.appendChild(div);
-        new QRCode(div, ips);
-
-    } else {
-        clanovi.forEach(ime => {
-            let dug = Number(document.getElementById(`dug_${ime}`).value);
-            if (dug > 0) {
-                let ips = `K:PR|V:01|C:1|R:${racun}|N:${document.getElementById("ime").value}|I:RSD${dug.toFixed(2).replace('.', ',')}|SF:289|S:Rucak-${ime}`;
-
-                out.innerHTML += `<h3>${ime}: ${dug} RSD</h3>`;
-                let div = document.createElement("div");
-                out.appendChild(div);
-                new QRCode(div, ips);
-            }
+    
+    if (stanje.metoda === "Ravnopravno") {
+        const poOsobi = Math.round(sumaUkupno / stanje.brojLjudi);
+        const izFmt = (poOsobi).toFixed(2).replace('.', ',');
+        const ipsData = `K:PR|V:01|C:1|R:${cRacun}|N:${imePrimaoca}|I:RSD${izFmt}|SF:289|S:Podela racuna`;
+        
+        const card = document.createElement("div");
+        card.className = "qr-card";
+        
+        const h4 = document.createElement("h4");
+        h4.textContent = `Iznos: ${formatirajBrojSaTackom(poOsobi)} RSD`;
+        card.appendChild(h4);
+        
+        const qrWrapper = document.createElement("div");
+        qrWrapper.className = "qr-image-wrapper";
+        const qrDiv = document.createElement("div");
+        qrWrapper.appendChild(qrDiv);
+        card.appendChild(qrWrapper);
+        
+        qrRezultatiContainer.appendChild(card);
+        
+        new QRCode(qrDiv, {
+            text: ipsData,
+            width: 220,
+            height: 220,
+            colorDark : "#000000",
+            colorLight : "#ffffff",
+            correctLevel : QRCode.CorrectLevel.M
         });
+        
+    } else {
+        // Ručni unos
+        for (const [ime, dug] of Object.entries(stanje.rucniIznosi)) {
+            if (dug > 0) {
+                const izFmt = (dug).toFixed(2).replace('.', ',');
+                const ipsData = `K:PR|V:01|C:1|R:${cRacun}|N:${imePrimaoca}|I:RSD${izFmt}|SF:289|S:Rucak-${ime}`;
+                
+                const card = document.createElement("div");
+                card.className = "qr-card";
+                
+                const h4 = document.createElement("h4");
+                h4.textContent = `${ime} - ${formatirajBrojSaTackom(dug)} RSD`;
+                card.expanded = true;
+                card.appendChild(h4);
+                
+                const qrWrapper = document.createElement("div");
+                qrWrapper.className = "qr-image-wrapper";
+                const qrDiv = document.createElement("div");
+                qrWrapper.appendChild(qrDiv);
+                card.appendChild(qrWrapper);
+                
+                qrRezultatiContainer.appendChild(card);
+                
+                new QRCode(qrDiv, {
+                    text: ipsData,
+                    width: 220,
+                    height: 220,
+                    colorDark : "#000000",
+                    colorLight : "#ffffff",
+                    correctLevel : QRCode.CorrectLevel.M
+                });
+            }
+        }
     }
 }
