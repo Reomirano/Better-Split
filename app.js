@@ -107,7 +107,7 @@ btnNoviIznos.addEventListener("click", () => {
     
     inputVRacun.value = "";
     inputVDostava.value = "";
-    brojLjudiInput.value = 2;
+    brojLjudiInput.value = "2";
     novoImeInput.value = "";
     qrRezultatiContainer.innerHTML = "";
     
@@ -244,12 +244,11 @@ function renderujRucneUcesnike() {
         nameDiv.textContent = o + ":";
         
         const inputNum = document.createElement("input");
-        inputNum.type = "number";
+        inputNum.type = "text";
+        inputNum.inputMode = "numeric";
         inputNum.className = "participant-input";
-        inputNum.min = "0";
         inputNum.placeholder = "0";
-        inputNum.step = "1";
-        inputNum.value = stanje.rucniIznosi[o] || "";
+        inputNum.value = stanje.rucniIznosi[o] ? stanje.rucniIznosi[o] : "";
         inputNum.addEventListener("input", (e) => {
             stanje.rucniIznosi[o] = parseFloat(e.target.value) || 0;
             osveziProracune();
