@@ -331,15 +331,17 @@ input:focus {
     margin-top: 10px;
 }
 
-.qr-canvas-box {
+.qr-image-box {
     background: white;
     padding: 12px;
     border-radius: 8px;
     display: inline-block;
 }
 
-.qr-canvas-box canvas, .qr-canvas-box img {
+.qr-image-box img {
     display: block;
+    width: 200px;
+    height: 200px;
     margin: 0 auto;
 }
 
