@@ -1,4 +1,4 @@
-/* --- TAMNO ZELENA TEMA (Bazirana na originalnoj Streamlit aplikaciji) --- */
+/* --- TAMNO ZELENA TEMA --- */
 :root {
     --bg-app: #081c15;
     --bg-card: #1b4332;
@@ -331,13 +331,16 @@ input:focus {
     margin-top: 10px;
 }
 
-.qr-image-wrapper img {
-    max-width: 250px;
-    width: 100%;
-    height: auto;
+.qr-canvas-box {
     background: white;
-    padding: 10px;
+    padding: 12px;
     border-radius: 8px;
+    display: inline-block;
+}
+
+.qr-canvas-box canvas, .qr-canvas-box img {
+    display: block;
+    margin: 0 auto;
 }
 
 /* Footer / Caption */
