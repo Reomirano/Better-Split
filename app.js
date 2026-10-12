@@ -26,6 +26,16 @@ function formatirajBrojSaTackom(broj) {
     return Math.round(broj).toLocaleString('de-DE');
 }
 
+// Pomoćna funkcija za uklanjanje naših kvačica (da qrcode.js ne pukne na UTF-8)
+function ukloniKvacice(str) {
+    return String(str)
+        .replace(/č/g, 'c').replace(/Č/g, 'C')
+        .replace(/ć/g, 'c').replace(/Ć/g, 'C')
+        .replace(/š/g, 's').replace(/Š/g, 'S')
+        .replace(/đ/g, 'dj').replace(/Đ/g, 'Dj')
+        .replace(/ž/g, 'z').replace(/Ž/g, 'Z');
+}
+
 // --- STANJE APLIKACIJE ---
 let stanje = {
     userName: "",
@@ -277,7 +287,7 @@ function generisiQRKodove() {
 
     const sumaUkupno = stanje.vRacun + stanje.vDostava;
     const cRacun = ocistiRacun(stanje.userBank);
-    const imePrimaoca = stanje.userName.trim();
+    const imePrimaoca = ukloniKvacice(stanje.userName.trim());
     
     if (!imePrimaoca || !cRacun) {
         alert("⚠️ Popuni podatke o primaocu na vrhu strane!");
@@ -318,7 +328,8 @@ function generisiQRKodove() {
         for (const [ime, dug] of Object.entries(stanje.rucniIznosi)) {
             if (dug > 0) {
                 const izFmt = (dug).toFixed(2).replace('.', ',');
-                const ipsData = `K:PR|V:01|C:1|R:${cRacun}|N:${imePrimaoca}|I:RSD${izFmt}|SF:289|S:Rucak-${ime}`;
+                const cistIme = ukloniKvacice(ime);
+                const ipsData = `K:PR|V:01|C:1|R:${cRacun}|N:${imePrimaoca}|I:RSD${izFmt}|SF:289|S:Rucak-${cistIme}`;
                 
                 const card = document.createElement("div");
                 card.className = "qr-card";
