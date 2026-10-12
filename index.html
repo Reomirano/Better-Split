@@ -2,53 +2,134 @@
 <html lang="sr">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Podela troškova</title>
     <link rel="stylesheet" href="style.css">
+    <!-- qrcode.js CDN za generisanje QR kodova -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 </head>
 <body>
+    <div class="app-container">
+        <!-- GLAVNI PANEL -->
+        <header>
+            <h1>💰 Podela troškova</h1>
+        </header>
 
-<h1>💰 Podela troškova</h1>
+        <!-- EKSPANDER: Kako ovo radi? -->
+        <details class="expander">
+            <summary>📖 Kako ovo radi?</summary>
+            <div class="expander-content">
+                <ol>
+                    <li><strong>Unesi podatke primaoca:</strong> Upiši svoje ime i broj računa direktno u polja ispod.</li>
+                    <li><strong>Unesi iznose:</strong> Upiši vrednost sa računa i cenu dostave.</li>
+                    <li><strong>Odaberi metodu:</strong>
+                        <ul>
+                            <li><strong>Ravnopravno:</strong> Unesi broj ljudi i dobijaš univerzalni QR kod.</li>
+                            <li><strong>Ručni unos:</strong> Dodaš imena učesnika i uneseš pojedinačnu vrednost.</li>
+                        </ul>
+                    </li>
+                    <li><strong>Skeniranje:</strong> Svako otvori mBanking, odabere 'IPS' i očita kod sa ekrana (univerzalni ili lični).</li>
+                </ol>
+            </div>
+        </details>
 
-<div class="box">
-    <h2>💳 Podaci o primaocu</h2>
+        <!-- SEKCIJA: Podaci o primaocu -->
+        <section class="card">
+            <h2>💳 Podaci o primaocu</h2>
+            <div class="grid-2">
+                <div class="input-group">
+                    <label for="userName">Primalac:</label>
+                    <input type="text" id="userName" placeholder="Ime i prezime">
+                </div>
+                <div class="input-group">
+                    <label for="userBank">Broj računa primaoca:</label>
+                    <input type="text" id="userBank" placeholder="npr. 160-12345678999-12">
+                </div>
+            </div>
+            <div id="validAccountBanner" class="valid-banner" style="display: none;">
+                Validan račun: <strong id="validAccountDisplay"></strong>
+            </div>
+        </section>
 
-    <label>Primalac:</label>
-    <input id="ime" type="text" placeholder="Ime i prezime">
+        <hr class="divider">
 
-    <label>Broj računa primaoca:</label>
-    <input id="racun" type="text" placeholder="npr. 160-12345678999-12">
+        <!-- SEKCIJA: Podaci o trošku -->
+        <section class="card">
+            <h2>🧾 Podaci o trošku</h2>
+            <div class="grid-2">
+                <div class="input-group">
+                    <label for="vRacun">Iznos sa računa (RSD):</label>
+                    <input type="number" id="vRacun" min="0" value="0" step="1">
+                </div>
+                <div class="input-group">
+                    <label for="vDostava">Dostava (RSD):</label>
+                    <input type="number" id="vDostava" min="0" value="0" step="1">
+                </div>
+            </div>
+            <button id="btnNoviIznos" class="btn secondary-btn">🔄 Novi iznos</button>
+            
+            <div class="metric-box">
+                <span class="metric-label">Ukupno</span>
+                <span id="sumaUkupnoDisplay" class="metric-value">0 RSD</span>
+            </div>
+        </section>
 
-    <div id="validanRacun" class="info"></div>
-</div>
+        <hr class="divider">
 
-<div class="box">
-    <h2>🧾 Podaci o trošku</h2>
+        <!-- METODA PODELE -->
+        <section>
+            <p class="section-title">Metoda podele:</p>
+            <div class="pills-container">
+                <button class="pill-btn active" data-method="Ravnopravno">Ravnopravno</button>
+                <button class="pill-btn" data-method="Rucni">Ručni unos</button>
+            </div>
 
-    <label>Iznos sa računa (RSD):</label>
-    <input id="iznos" type="number" min="0" value="0">
+            <!-- RAVNOPRAVNO PANEL -->
+            <div id="panelRavnopravno" class="card split-panel">
+                <div class="input-group">
+                    <label for="brojLjudi">Ukupan broj osoba:</label>
+                    <input type="number" id="brojLjudi" min="1" value="2" step="1">
+                </div>
+                <div id="infoRavnopravno" class="info-box" style="display: none;">
+                    Po osobi: <strong id="poOsobiDisplay">0 RSD</strong>
+                </div>
+            </div>
 
-    <label>Dostava (RSD):</label>
-    <input id="dostava" type="number" min="0" value="0">
+            <!-- RUČNI UNOS PANEL -->
+            <div id="panelRucni" class="card split-panel" style="display: none;">
+                <div class="input-group">
+                    <label for="novoImeInput">Dodaj učesnika na listu (potvrdi na Enter):</label>
+                    <input type="text" id="novoImeInput" placeholder="Ime učesnika...">
+                </div>
 
-    <div id="ukupno" class="metric"></div>
-</div>
+                <div id="dostavaInfoBox" class="info-box" style="display: none; margin-bottom: 20px;">
+                    Učešće u dostavi po osobi: <strong id="dostavaPoOsobiDisplay">0 RSD</strong>
+                </div>
 
-<div class="box">
-    <h2>Metoda podele</h2>
+                <div id="listaUcesnikaContainer">
+                    <!-- Dinamički ubačeni učesnici -->
+                </div>
 
-    <button class="pill" onclick="setMode('equal')">Ravnopravno</button>
-    <button class="pill" onclick="setMode('manual')">Ručni unos</button>
+                <div id="statusRazlikeContainer" style="margin-top: 15px;"></div>
 
-    <div id="modeBox"></div>
-</div>
+                <button id="btnObrisiListu" class="btn danger-btn" style="margin-top: 15px; display: none;">Obriši celu listu</button>
+            </div>
+        </section>
 
-<div class="box">
-    <button id="qrBtn" onclick="generateQR()">⚡ GENERIŠI QR KODOVE</button>
-    <div id="qrOutput"></div>
-</div>
+        <!-- QR SEKCIJA -->
+        <hr class="divider">
+        <button id="btnGenerisiQR" class="btn primary-btn" style="display: none;">⚡ GENERIŠI QR KODOVE</button>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-<script src="app.js"></script>
+        <div id="qrRezultatiContainer" style="margin-top: 20px;"></div>
 
+        <!-- FOOTER / DISCLAIMER -->
+        <hr class="divider">
+        <footer>
+            <p class="caption"><strong>Napomena:</strong> Aplikacija je namenjena isključivo za plaćanja u okviru <strong>IPS sistema Narodne banke Srbije</strong>. Pre potvrde plaćanja, obavezno <strong>proverite ispravnost podataka</strong>. Autor ne snosi odgovornost za pogrešne uplate.</p>
+            <p class="caption" style="margin-top: 8px;"><strong>Disclaimer:</strong> This app is designed solely for <strong>Serbian IPS payments</strong>. Please verify all details before confirming. The author is not responsible for any incorrect payments.</p>
+        </footer>
+    </div>
+
+    <script src="app.js"></script>
 </body>
 </html>
