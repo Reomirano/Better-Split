@@ -1,92 +1,367 @@
+/* --- TAMNO ZELENA TEMA (Bazirana na originalnoj Streamlit aplikaciji) --- */
+:root {
+    --bg-app: #081c15;
+    --bg-card: #1b4332;
+    --border-color: #2d6a4f;
+    --accent-green: #52b788;
+    --light-green: #b7e4c7;
+    --placeholder-green: #95d5b2;
+    --hover-green: #40916c;
+    --text-color: #ffffff;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
 body {
-    background-color: #081c15;
-    color: #ffffff;
-    font-family: Arial, sans-serif;
-    padding: 20px;
+    background-color: var(--bg-app);
+    color: var(--text-color);
+    padding: 20px 10px;
+    display: flex;
+    justify-content: center;
 }
 
-h1, h2 {
-    color: #b7e4c7;
-}
-
-.box {
-    background-color: #1b4332;
-    padding: 20px;
-    border-radius: 10px;
-    margin-bottom: 20px;
-    border-left: 5px solid #52b788;
-}
-
-input {
+.app-container {
     width: 100%;
+    max-width: 700px;
+    background-color: var(--bg-app);
     padding: 10px;
-    margin: 8px 0 15px 0;
-    background-color: #1b4332;
-    border: 1px solid #2d6a4f;
-    border-radius: 8px;
-    color: #ffffff;
 }
 
-button {
-    background-color: #2d6a4f;
-    color: white;
-    padding: 12px 20px;
-    border: none;
-    border-radius: 8px;
-    font-size: 1.1rem;
-    cursor: pointer;
-}
-
-button:hover {
-    background-color: #40916c;
-}
-
-.pill {
-    margin-right: 10px;
-}
-
-.metric {
-    font-size: 1.5rem;
-    color: #52b788;
-}
-
-.info {
-    margin-top: 10px;
-    font-size: 1rem;
-}
-/* Moderniji izgled */
-body {
-    background: linear-gradient(180deg, #0b3d2e 0%, #081c15 100%);
-    font-family: 'Segoe UI', sans-serif;
-    color: #f8f9fa;
-}
-
-.box {
-    background-color: #1b4332;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-    transition: transform 0.2s ease;
-}
-
-.box:hover {
-    transform: translateY(-2px);
-}
-
-input, button {
-    font-size: 1.1rem;
-}
-
-button {
-    background: #52b788;
-    color: #081c15;
-    font-weight: 600;
-}
-
-button:hover {
-    background: #74c69d;
+h1, h2, h3, h4, h5, h6, p, span, label, div {
+    color: var(--text-color);
 }
 
 h1 {
-    color: #95d5b2;
-    text-shadow: 0 2px 4px rgba(0,0,0,0.4);
+    font-size: 2.2rem;
+    margin-bottom: 20px;
 }
 
+h2 {
+    font-size: 1.5rem;
+    margin-bottom: 12px;
+}
+
+/* Ekspander */
+.expander {
+    background-color: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 15px;
+    margin-bottom: 20px;
+}
+
+.expander summary {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--light-green);
+    cursor: pointer;
+    list-style: none;
+    display: flex;
+    align-items: center;
+}
+
+.expander summary::-webkit-details-marker {
+    display: none;
+}
+
+.expander-content {
+    margin-top: 15px;
+    padding-left: 20px;
+    line-height: 1.6;
+}
+
+.expander-content ol, .expander-content ul {
+    margin-left: 10px;
+}
+
+.expander-content li {
+    margin-bottom: 8px;
+}
+
+/* Kartice i kontejneri */
+.card {
+    background-color: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+.grid-2 {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 15px;
+}
+
+@media (min-width: 600px) {
+    .grid-2 {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+.input-group {
+    margin-bottom: 12px;
+    display: flex;
+    flex-direction: column;
+}
+
+.input-group label {
+    font-weight: 600;
+    margin-bottom: 6px;
+    font-size: 0.95rem;
+}
+
+/* Input polja */
+input, textarea, select {
+    background-color: var(--bg-card);
+    color: var(--text-color);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-size: 1rem;
+    outline: none;
+    width: 100%;
+}
+
+input::placeholder, textarea::placeholder {
+    color: var(--placeholder-green);
+    opacity: 1;
+}
+
+input:focus {
+    border-color: var(--accent-green);
+}
+
+/* Baneri i obaveštenja */
+.valid-banner {
+    padding: 10px 14px;
+    background-color: var(--bg-card);
+    border-radius: 6px;
+    border-left: 4px solid var(--accent-green);
+    margin-top: 10px;
+    font-size: 1rem;
+    font-weight: 500;
+    color: var(--light-green);
+}
+
+.info-box {
+    background-color: var(--bg-app);
+    padding: 12px;
+    border-radius: 8px;
+    border-left: 5px solid var(--accent-green);
+    margin-top: 10px;
+    font-size: 1.05rem;
+}
+
+.warning-box {
+    background-color: #382c0b;
+    padding: 12px;
+    border-radius: 8px;
+    border-left: 5px solid #ffb703;
+    color: #ffb703;
+    font-weight: 600;
+}
+
+.error-box {
+    background-color: #3d1414;
+    padding: 12px;
+    border-radius: 8px;
+    border-left: 5px solid #e63946;
+    color: #ff6b6b;
+    font-weight: 600;
+}
+
+/* Metrika */
+.metric-box {
+    margin-top: 15px;
+    display: flex;
+    flex-direction: column;
+}
+
+.metric-label {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-color);
+    margin-bottom: 4px;
+}
+
+.metric-value {
+    color: var(--accent-green);
+    font-size: 1.8rem;
+    font-weight: 700;
+}
+
+.divider {
+    border: none;
+    border-top: 1px solid var(--border-color);
+    margin: 20px 0;
+}
+
+/* Dugmad */
+.btn {
+    width: 100%;
+    padding: 12px 20px;
+    border-radius: 8px;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+    font-size: 1.1rem;
+    text-align: center;
+}
+
+.secondary-btn {
+    background-color: var(--border-color);
+    color: white;
+    font-size: 1.3rem;
+    padding: 14px;
+    margin-top: 10px;
+}
+
+.secondary-btn:hover {
+    background-color: var(--hover-green);
+}
+
+.primary-btn {
+    background-color: var(--border-color);
+    color: white;
+    font-size: 1.3rem;
+    padding: 14px;
+}
+
+.primary-btn:hover {
+    background-color: var(--hover-green);
+    transform: translateY(-1px);
+}
+
+.danger-btn {
+    background-color: #9b2226;
+    color: white;
+}
+
+.danger-btn:hover {
+    background-color: #ae2012;
+}
+
+/* Pills meni */
+.section-title {
+    font-size: 1.35rem;
+    font-weight: 700;
+    margin-bottom: 10px;
+}
+
+.pills-container {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.pill-btn {
+    flex: 1;
+    background-color: var(--bg-card);
+    color: var(--text-color);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 10px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.pill-btn.active {
+    background-color: var(--border-color);
+    border-color: var(--accent-green);
+}
+
+/* Red za ručni unos učesnika */
+.participant-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.participant-name {
+    flex: 2;
+    font-weight: 600;
+}
+
+.participant-input {
+    flex: 2;
+}
+
+.participant-delete {
+    flex: 0.6;
+    background-color: #3d1414;
+    border: 1px solid #e63946;
+    color: white;
+    border-radius: 6px;
+    padding: 8px;
+    cursor: pointer;
+    font-size: 1rem;
+}
+
+.participant-delete:hover {
+    background-color: #e63946;
+}
+
+/* QR Rezultati kartica */
+.qr-card {
+    background-color: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 15px;
+    text-align: center;
+}
+
+.qr-card h4 {
+    margin-bottom: 15px;
+    font-size: 1.2rem;
+}
+
+.qr-image-wrapper {
+    display: flex;
+    justify-content: center;
+    margin-top: 10px;
+}
+
+.qr-image-wrapper img {
+    max-width: 250px;
+    width: 100%;
+    height: auto;
+    background: white;
+    padding: 10px;
+    border-radius: 8px;
+}
+
+/* Footer / Caption */
+.caption {
+    font-size: 0.85rem;
+    color: #a3b18a;
+    line-height: 1.5;
+}
+
+/* Mobilna prilagođavanja */
+@media (max-width: 480px) {
+    h1 {
+        font-size: 1.8rem;
+    }
+    .expander summary {
+        font-size: 1.4rem;
+    }
+    .participant-row {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 5px;
+        background: rgba(27, 67, 50, 0.5);
+        padding: 10px;
+        border-radius: 8px;
+        border: 1px solid var(--border-color);
+    }
+}
