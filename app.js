@@ -172,7 +172,7 @@ function osveziProracune() {
     const sumaUkupno = stanje.vRacun + stanje.vDostava;
     sumaUkupnoDisplay.textContent = formatirajBrojSaTackom(sumaUkupno) + " RSD";
     
-    let validnaPodela = false;
+    let validnaPodelaFlag = false;
     
     if (stanje.metoda === "Ravnopravno") {
         if (stanje.brojLjudi > 1 && sumaUkupno > 0) {
@@ -180,10 +180,10 @@ function osveziProracune() {
             const poOsobiZaokruzeno = Math.round(poOsobi);
             poOsobiDisplay.textContent = formatirajBrojSaTackom(poOsobiZaokruzeno) + " RSD";
             infoRavnopravno.style.display = "block";
-            validna_podela_flag = true;
+            validnaPodelaFlag = true;
         } else {
             infoRavnopravno.style.display = "none";
-            validna_podela_flag = false;
+            validnaPodelaFlag = false;
         }
     } else {
         // Ručni unos
@@ -202,24 +202,24 @@ function osveziProracune() {
             const ostatak = sumaUkupno - trenutnaSuma;
             if (Math.abs(ostatak) < 0.01 && sumaUkupno > 0) {
                 statusRazlikeContainer.innerHTML = `<div class="info-box">Izbori su potpuno izbalansirani!</div>`;
-                validna_podela_flag = true;
+                validnaPodelaFlag = true;
             } else if (ostatak > 0) {
                 statusRazlikeContainer.innerHTML = `<div class="warning-box">Preostalo: <strong>${formatirajBrojSaTackom(ostatak)} RSD</strong></div>`;
-                validna_podela_flag = false;
+                validnaPodelaFlag = false;
             } else {
                 statusRazlikeContainer.innerHTML = `<div class="error-box">Višak: <strong>${formatirajBrojSaTackom(Math.abs(ostatak))} RSD</strong></div>`;
-                validna_podela_flag = false;
+                validnaPodelaFlag = false;
             }
         } else {
             dostavaInfoBox.style.display = "none";
             btnObrisiListu.style.display = "none";
             statusRazlikeContainer.innerHTML = "";
-            validna_podela_flag = false;
+            validnaPodelaFlag = false;
         }
     }
     
     // Prikaz dugmeta za QR kodove
-    if (validna_podela_flag && sumaUkupno > 0 && stanje.userName.trim() && stanje.userBank.trim()) {
+    if (validnaPodelaFlag && sumaUkupno > 0 && stanje.userName.trim() && stanje.userBank.trim()) {
         btnGenerisiQR.style.display = "block";
     } else {
         btnGenerisiQR.style.display = "none";
@@ -296,6 +296,7 @@ function generisiQRKodove() {
         const qrWrapper = document.createElement("div");
         qrWrapper.className = "qr-image-wrapper";
         const qrDiv = document.createElement("div");
+        qrDiv.className = "qr-canvas-box";
         qrWrapper.appendChild(qrDiv);
         card.appendChild(qrWrapper);
         
@@ -303,8 +304,8 @@ function generisiQRKodove() {
         
         new QRCode(qrDiv, {
             text: ipsData,
-            width: 220,
-            height: 220,
+            width: 200,
+            height: 200,
             colorDark : "#000000",
             colorLight : "#ffffff",
             correctLevel : QRCode.CorrectLevel.M
@@ -322,12 +323,12 @@ function generisiQRKodove() {
                 
                 const h4 = document.createElement("h4");
                 h4.textContent = `${ime} - ${formatirajBrojSaTackom(dug)} RSD`;
-                card.expanded = true;
                 card.appendChild(h4);
                 
                 const qrWrapper = document.createElement("div");
                 qrWrapper.className = "qr-image-wrapper";
                 const qrDiv = document.createElement("div");
+                qrDiv.className = "qr-canvas-box";
                 qrWrapper.appendChild(qrDiv);
                 card.appendChild(qrWrapper);
                 
@@ -335,8 +336,8 @@ function generisiQRKodove() {
                 
                 new QRCode(qrDiv, {
                     text: ipsData,
-                    width: 220,
-                    height: 220,
+                    width: 200,
+                    height: 200,
                     colorDark : "#000000",
                     colorLight : "#ffffff",
                     correctLevel : QRCode.CorrectLevel.M
