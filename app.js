@@ -26,7 +26,6 @@ function formatirajBrojSaTackom(broj) {
     return Math.round(broj).toLocaleString('de-DE');
 }
 
-// Pomoćna funkcija za uklanjanje naših kvačica (da qrcode.js ne pukne na UTF-8)
 function ukloniKvacice(str) {
     return String(str)
         .replace(/č/g, 'c').replace(/Č/g, 'C')
@@ -279,11 +278,6 @@ function proveriGlavniQRUslov() {
 
 function generisiQRKodove() {
     qrRezultatiContainer.innerHTML = "";
-    
-    if (typeof QRCode === 'undefined') {
-        alert("⚠️ QR biblioteka nije učitana!");
-        return;
-    }
 
     const sumaUkupno = stanje.vRacun + stanje.vDostava;
     const cRacun = ocistiRacun(stanje.userBank);
@@ -308,21 +302,17 @@ function generisiQRKodove() {
         
         const qrWrapper = document.createElement("div");
         qrWrapper.className = "qr-image-wrapper";
-        const qrDiv = document.createElement("div");
-        qrDiv.className = "qr-canvas-box";
-        qrWrapper.appendChild(qrDiv);
+        const qrBox = document.createElement("div");
+        qrBox.className = "qr-image-box";
+        
+        const img = document.createElement("img");
+        img.src = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(ipsData)}`;
+        img.alt = "IPS QR Kod";
+        
+        qrBox.appendChild(img);
+        qrWrapper.appendChild(qrBox);
         card.appendChild(qrWrapper);
-        
         qrRezultatiContainer.appendChild(card);
-        
-        new QRCode(qrDiv, {
-            text: ipsData,
-            width: 200,
-            height: 200,
-            colorDark : "#000000",
-            colorLight : "#ffffff",
-            correctLevel : QRCode.CorrectLevel.M
-        });
         
     } else {
         for (const [ime, dug] of Object.entries(stanje.rucniIznosi)) {
@@ -340,21 +330,17 @@ function generisiQRKodove() {
                 
                 const qrWrapper = document.createElement("div");
                 qrWrapper.className = "qr-image-wrapper";
-                const qrDiv = document.createElement("div");
-                qrDiv.className = "qr-canvas-box";
-                qrWrapper.appendChild(qrDiv);
+                const qrBox = document.createElement("div");
+                qrBox.className = "qr-image-box";
+                
+                const img = document.createElement("img");
+                img.src = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(ipsData)}`;
+                img.alt = "IPS QR Kod";
+                
+                qrBox.appendChild(img);
+                qrWrapper.appendChild(qrBox);
                 card.appendChild(qrWrapper);
-                
                 qrRezultatiContainer.appendChild(card);
-                
-                new QRCode(qrDiv, {
-                    text: ipsData,
-                    width: 200,
-                    height: 200,
-                    colorDark : "#000000",
-                    colorLight : "#ffffff",
-                    correctLevel : QRCode.CorrectLevel.M
-                });
             }
         }
     }
