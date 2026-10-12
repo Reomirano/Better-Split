@@ -208,7 +208,7 @@ function osveziProracune() {
             
             const ostatak = sumaUkupno - trenutnaSuma;
             if (Math.abs(ostatak) < 0.01 && sumaUkupno > 0) {
-                statusRazlikeContainer.innerHTML = `<div class="info-box">Izbori su potpuno izbalansirani!</div>`;
+                statusRazlikeContainer.innerHTML = `<div class="info-box">Iznosi su potpuno izbalansirani!</div>`;
                 validnaPodelaFlag = true;
             } else if (ostatak > 0) {
                 statusRazlikeContainer.innerHTML = `<div class="warning-box">Preostalo: <strong>${formatirajBrojSaTackom(ostatak)} RSD</strong></div>`;
