@@ -54,3 +54,39 @@ button:hover {
     margin-top: 10px;
     font-size: 1rem;
 }
+/* Moderniji izgled */
+body {
+    background: linear-gradient(180deg, #0b3d2e 0%, #081c15 100%);
+    font-family: 'Segoe UI', sans-serif;
+    color: #f8f9fa;
+}
+
+.box {
+    background-color: #1b4332;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    transition: transform 0.2s ease;
+}
+
+.box:hover {
+    transform: translateY(-2px);
+}
+
+input, button {
+    font-size: 1.1rem;
+}
+
+button {
+    background: #52b788;
+    color: #081c15;
+    font-weight: 600;
+}
+
+button:hover {
+    background: #74c69d;
+}
+
+h1 {
+    color: #95d5b2;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.4);
+}
+
