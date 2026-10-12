@@ -57,11 +57,11 @@
             <div class="grid-2">
                 <div class="input-group">
                     <label for="vRacun">Iznos sa računa (RSD):</label>
-                    <input type="number" id="vRacun" min="0" placeholder="0" step="1">
+                    <input type="text" inputmode="numeric" id="vRacun" placeholder="0">
                 </div>
                 <div class="input-group">
                     <label for="vDostava">Dostava (RSD):</label>
-                    <input type="number" id="vDostava" min="0" placeholder="0" step="1">
+                    <input type="text" inputmode="numeric" id="vDostava" placeholder="0">
                 </div>
             </div>
             <button id="btnNoviIznos" class="btn secondary-btn">🔄 Novi iznos</button>
@@ -86,7 +86,7 @@
             <div id="panelRavnopravno" class="card split-panel">
                 <div class="input-group">
                     <label for="brojLjudi">Ukupan broj osoba:</label>
-                    <input type="number" id="brojLjudi" min="1" value="2" step="1">
+                    <input type="text" inputmode="numeric" id="brojLjudi" value="2">
                 </div>
                 <div id="infoRavnopravno" class="info-box" style="display: none;">
                     Po osobi: <strong id="poOsobiDisplay">0 RSD</strong>
